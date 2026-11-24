@@ -1,0 +1,54 @@
+digraph G {
+graph [rankdir=TB, bgcolor="white", pad=0.3, nodesep=0.35, ranksep=0.4, fontname="Times New Roman,", fontsize=12];
+node [shape=box, style="rounded,filled", fontname="Times New Roman,", fontsize=11, color="#2F5597", fillcolor="#EAF2F8", margin="0.12,0.08"];
+edge [fontname="Times New Roman,", fontsize=9, color="#555555"];
+
+subgraph cluster_op {
+label="Складская операция: Warehouse.receive(code, q[, approved]) / Warehouse.issue(code, q)"; color="#2F5597"; style="rounded";
+start [label="Начало", shape=oval, fillcolor="#E2F0D9", color="#548235"];
+end [label="Завершение", shape=oval, fillcolor="#FCE4D6", color="#C65911"];
+n1 [label="Получить складскую операцию:\nтип (RECEIVE / ISSUE), code, q", shape=parallelogram, fillcolor="#E4DFEC", color="#7030A0"];
+n2 [label="Найти позицию по коду в Map\n(items.get(code), O(1))"];
+n3 [label="Позиция существует?\n(R9)", shape=diamond, fillcolor="#FFF2CC", color="#BF9000"];
+n4 [label="A1: q > 0?\nдля ISSUE ещё остаток − q >= 0 (R2)", shape=diamond, fillcolor="#FFF2CC", color="#BF9000"];
+n5 [label="Обновить остаток:\nRECEIVE — increase(q), ISSUE — decrease(q)"];
+v1 [label="Вариант 16, часть А:\nRECEIVE, q > 500 и нет подтверждения?", shape=diamond, fillcolor="#FFF2CC", color="#BF9000"];
+v2 [label="confirmed = false\n(крупный приход ждёт подтверждения)", fillcolor="#E2F0D9", color="#548235"];
+v3 [label="confirmed = true"];
+n6 [label="Добавить запись движения в историю\nStockMovement(code, type, q, confirmed) (R3)"];
+n7 [label="A2: сводка по категориям не хранится отдельно —\ntotalsByCategory() пересчитывает суммы из items\nпри следующем вызове, поэтому уже учитывает новый остаток", shape=note, style="filled", fillcolor="#FFFFFF", color="#7F7F7F", fontsize=10];
+n8 [label="Выбросить IllegalArgumentException\n(\"code not found\" / \"q must be > 0\" /\n\"quantity cannot become negative\")", fillcolor="#FCE4D6", color="#C65911"];
+
+start -> n1;
+n1 -> n2;
+n2 -> n3;
+n3 -> n4 [label="да"];
+n3 -> n8 [label="нет"];
+n4 -> n5 [label="допустимо"];
+n4 -> n8 [label="ошибка"];
+n5 -> v1;
+v1 -> v2 [label="да"];
+v1 -> v3 [label="нет (ISSUE, q <= 500\nили approved)"];
+v2 -> n6;
+v3 -> n6;
+n6 -> end;
+n6 -> n7 [style=dashed, arrowhead=none, color="#7F7F7F"];
+n8 -> end;
+}
+
+subgraph cluster_b {
+label="Вариант 16, часть Б: Warehouse.addUnconfirmedMovements(wh)"; color="#548235"; style="rounded,dashed";
+b0 [label="Начало", shape=oval, fillcolor="#E2F0D9", color="#548235"];
+b1 [label="wh == null?", shape=diamond, fillcolor="#FFF2CC", color="#BF9000"];
+berr [label="Выбросить IllegalArgumentException\n(\"warehouse is null\")", fillcolor="#FCE4D6", color="#C65911"];
+b2 [label="Для каждого движения из movements:\nесли confirmed == false — добавить в новый ArrayList"];
+b3 [label="Вернуть новый список\n(не ссылку на movements, R6)"];
+b4 [label="Завершение", shape=oval, fillcolor="#FCE4D6", color="#C65911"];
+b0 -> b1;
+b1 -> berr [label="да"];
+b1 -> b2 [label="нет"];
+b2 -> b3;
+b3 -> b4;
+berr -> b4;
+}
+}

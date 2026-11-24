@@ -1,0 +1,24 @@
+digraph C {
+graph [rankdir=TB, bgcolor="white", pad=0.3, nodesep=0.6, ranksep=0.7];
+node [shape=record, style="filled", fontname="Times New Roman,", fontsize=11, color="#2F5597", fillcolor="#F7FBFF"];
+edge [fontname="Times New Roman,", fontsize=10, color="#555555"];
+
+s [label="{SelfCheck|- DATA_FILE : String\l- passed : int\l- failed : int\l|+ main(String[]) : void\l- runUnitChecks() : void\l- runDataChecks() : void\l- runInteractive() : void\l- applyRow(Warehouse, String[]) : String\l- execute(Warehouse, String[]) : String\l- parseCategory(String) : Category\l- parseQuantity(String) : int\l- report(String, boolean, String) : void\l}"];
+
+w [label="{Warehouse|+ CONFIRMATION_LIMIT : int = 500\l- items : Map\<String, StockItem\> \{final\}\l- movements : List\<StockMovement\> \{final\}\l|+ addItem(StockItem) : void\l+ receive(String, int) : void\l+ receive(String, int, boolean) : void\l+ issue(String, int) : void\l+ findByCategory(Category) : List\<StockItem\>\l+ totalsByCategory() : Map\<Category, Integer\>\l+ addUnconfirmedMovements(Warehouse) : List\<StockMovement\> \{static\}\l+ quantityOf(String) : int\l+ itemsCount() : int\l+ movementsCount() : int\l- findExisting(String) : StockItem\l- requiresConfirmation(int) : boolean\l}"];
+
+i [label="{StockItem|- code : String \{final\}\l- name : String \{final\}\l- category : Category \{final\}\l- quantity : int\l|+ StockItem(String, String, Category, int)\l+ increase(int) : void\l+ decrease(int) : void\l+ equals(Object) : boolean\l+ hashCode() : int\l+ toString() : String\l+ getCode() : String\l+ getName() : String\l+ getCategory() : Category\l+ getQuantity() : int\l}"];
+
+m [label="{«record»\nStockMovement|itemCode : String\ltype : MovementType\lquantity : int\lconfirmed : boolean  (вариант 16)\l|+ StockMovement(String, MovementType, int, boolean)\l+ StockMovement(String, MovementType, int)\l}"];
+
+cat [label="{«enum»\nCategory|COMPUTER\lDISPLAY\lPERIPHERAL\lNETWORK\l}"];
+mt [label="{«enum»\nMovementType|RECEIVE\lISSUE\l}"];
+
+s -> w [label="uses / тестирует", style=dashed, arrowhead=open];
+w -> i [label="items 0..*", arrowtail=diamond, dir=both, arrowhead=open];
+w -> m [label="movements 0..*", arrowtail=diamond, dir=both, arrowhead=open];
+i -> cat [label="category", arrowhead=open];
+m -> mt [label="type", arrowhead=open];
+{rank=same; i; m;}
+{rank=same; cat; mt;}
+}

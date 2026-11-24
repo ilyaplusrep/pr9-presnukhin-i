@@ -1,0 +1,35 @@
+code;name;category;quantity;expected
+# sample.csv: строки позиций code;name;category;quantity;expected обрабатываются через addItem
+# expected: OK:qty=N — позиция добавлена; SKIP:<причина> — строка отклонена
+# === Корректные позиции ===
+NB-01;Notebook;COMPUTER;12;OK:qty=12
+MN-01;Monitor;DISPLAY;7;OK:qty=7
+KB-01;Keyboard;PERIPHERAL;20;OK:qty=20
+SW-01;Switch;NETWORK;5;OK:qty=5
+# === Дубликат кода (R1) ===
+NB-01;Notebook Pro;COMPUTER;3;SKIP:code already exists
+# === quantity < 0 (R7) ===
+XX-01;Broken;COMPUTER;-5;SKIP:quantity must be >= 0
+# === Неизвестная категория (R4), регистр важен ===
+YY-01;Unknown;UNKNOWN;10;SKIP:category not found
+YY-02;Lowercase;computer;10;SKIP:category not found
+# === Пустое имя (R8), quantity не число ===
+ZZ-01; ;DISPLAY;1;SKIP:name is null or blank
+ZZ-02;Mouse;PERIPHERAL;abc;SKIP:quantity not a number
+# === Граничное значение: quantity = 0 допустимо ===
+ZP-01;Zero Item;PERIPHERAL;0;OK:qty=0
+# === После загрузки: 5 позиций, COMPUTER=12, DISPLAY=7, PERIPHERAL=20, NETWORK=5 ===
+# === Операции: RECEIVE|ISSUE;code;-;q;expected → OK:qty=N,confirmed=true|false ===
+RECEIVE;NB-01;-;5;OK:qty=17,confirmed=true
+ISSUE;NB-01;-;3;OK:qty=14,confirmed=true
+ISSUE;NB-01;-;14;OK:qty=0,confirmed=true
+ISSUE;NB-01;-;1;SKIP:quantity cannot become negative
+RECEIVE;XX-99;-;1;SKIP:code not found
+RECEIVE;MN-01;-;0;SKIP:q must be > 0
+# === Вариант 16, часть А: приход > 500 требует подтверждения ===
+RECEIVE;KB-01;-;500;OK:qty=520,confirmed=true
+RECEIVE;KB-01;-;501;OK:qty=1021,confirmed=false
+RECEIVE;SW-01;-;1000;OK:qty=1005,confirmed=false
+ISSUE;KB-01;-;600;OK:qty=421,confirmed=true
+# === Вариант 16, часть Б: addUnconfirmedMovements ===
+UNCONFIRMED;-;-;-;OK:count=2
