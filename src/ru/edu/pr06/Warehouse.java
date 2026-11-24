@@ -15,7 +15,7 @@ public class Warehouse {
     // List для упорядоченной истории движений
     private final List<StockMovement> movements = new ArrayList<>();
 
-    // TODO 3: R8 (null), R1 (уникальность кода)
+    // Задание 3 каркаса: R8 (null), R1 (уникальность кода)
     public void addItem(StockItem item) {
         if (item == null)
             throw new IllegalArgumentException("item is null");
@@ -24,7 +24,7 @@ public class Warehouse {
         items.put(item.getCode(), item);
     }
 
-    // TODO 4: приход без подтверждения (R3, R9; вариант 16 — крупный приход помечается неподтверждённым)
+    // Задание 4 каркаса: приход без подтверждения (R3, R9; вариант 16 — крупный приход помечается неподтверждённым)
     public void receive(String code, int q) {
         receive(code, q, false);
     }
@@ -37,14 +37,14 @@ public class Warehouse {
         movements.add(new StockMovement(code, MovementType.RECEIVE, q, confirmed));
     }
 
-    // TODO 5: выдача (R2 через decrease, R3, R9)
+    // Задание 5 каркаса: выдача (R2 через decrease, R3, R9)
     public void issue(String code, int q) {
         StockItem item = findExisting(code);
         item.decrease(q);
         movements.add(new StockMovement(code, MovementType.ISSUE, q));
     }
 
-    // TODO 6: поиск по категории, возвращается новый список (R5)
+    // Задание 6 каркаса: поиск по категории, возвращается новый список (R5)
     public List<StockItem> findByCategory(Category c) {
         List<StockItem> result = new ArrayList<>();
         for (StockItem item : items.values()) {
@@ -55,7 +55,7 @@ public class Warehouse {
         return result;
     }
 
-    // TODO 7: сумма остатков по категориям; отсутствующие категории не включаются
+    // Задание 7 каркаса: сумма остатков по категориям; отсутствующие категории не включаются
     public Map<Category, Integer> totalsByCategory() {
         Map<Category, Integer> result = new HashMap<>();
         for (StockItem item : items.values()) {

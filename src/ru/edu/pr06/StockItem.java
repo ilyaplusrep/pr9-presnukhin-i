@@ -27,14 +27,14 @@ public class StockItem {
         this.quantity = quantity;
     }
 
-    // TODO 1: увеличение остатка
+    // Задание 1 каркаса: увеличение остатка
     public void increase(int q) {
         if (q <= 0)
             throw new IllegalArgumentException("q must be > 0");
         this.quantity += q;
     }
 
-    // TODO 2: уменьшение остатка, R2 — остаток не может стать отрицательным
+    // Задание 2 каркаса: уменьшение остатка, R2 — остаток не может стать отрицательным
     public void decrease(int q) {
         if (q <= 0)
             throw new IllegalArgumentException("q must be > 0");
